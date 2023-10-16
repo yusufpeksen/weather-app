@@ -2,9 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body {
-    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-image: url(/src/assets/bg.jpg);
+    background-position:center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
