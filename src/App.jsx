@@ -15,7 +15,7 @@ function App() {
     if (city) {
       axios
         .get(
-          `http://api.weatherapi.com/v1/forecast.json?key=6cf74598e9e0485d991182324231310&q=${city}&days=7`
+          `https://api.weatherapi.com/v1/forecast.json?key=6cf74598e9e0485d991182324231310&q=${city}&days=7`
         )
         .then((response) => {
           const data = response.data;
