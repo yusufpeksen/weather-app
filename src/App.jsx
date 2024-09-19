@@ -12,14 +12,12 @@ function App() {
   const [nextForeCasts, setNextForeCasts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
 
-  // Find user's first location and set the weather
   useEffect(() => {
-    axios.get('https://ipapi.co/json').then((response) => {
-    setCity(response.data.city);
-  });
-  }, [])
+    axios.get("https://ipapi.co/json").then((response) => {
+      setCity(response.data.city);
+    });
+  }, []);
 
-  // Change the city for search
   useEffect(() => {
     if (city) {
       axios
@@ -28,15 +26,15 @@ function App() {
         )
         .then((response) => {
           const data = response.data;
-          const nextForecastDatas = data.forecast.forecastday.slice(1, 3);
+          const nextForecastDatas = data.forecast.forecastday;
           setImgWeather(data.current.condition.icon);
           setCountry(data.location.country);
           setDegree(data.current.feelslike_c);
           setForeCast(data.current.condition.text);
           setNextForeCasts(nextForecastDatas);
         })
-        .catch((err) => {
-          console.log("This city had not found.");
+        .catch(() => {
+          console.log("City not found.");
           setImgWeather(null);
           setCountry(null);
           setDegree(null);
@@ -56,8 +54,7 @@ function App() {
         .then((response) => {
           setSearchResults(response.data);
         })
-        .catch((error) => {
-          console.error(error);
+        .catch(() => {
           setSearchResults([]);
         });
     } else {
@@ -70,59 +67,64 @@ function App() {
     setSearchResults([]);
   };
 
-
   return (
-    <div className="max-[600px]:min-h-[1200px] rounded-[25px] flex items-center flex-col">
-      <div className="flex mt-[50px]">
-        <div className="flex flex-col">
-          <div className="relative">
-            <input
-              ref={inputRef}
-              placeholder="Search City"
-              className="rounded-[20px] px-[15px] text-center h-[35px] w-[350px] text-white focus:outline-1 focus:outline-white bg-[#000000a5]"
-              onChange={handleInputChange}
-            />
-            <AiOutlineSearch className="absolute top-[0.4rem] right-2 text-[22px] text-white transform rotate-90 placeholder:text-white" />
-            <ul className="absolute top-[100%] left-0 w-[350px] bg-white block overflow-y-auto rounded-[10px] mt-2">
+    <div className="min-h-screen flex items-center justify-center py-10 px-4 main-content">
+      <div className="max-w-4xl min-w-[550px] w-full bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center space-y-6">
+        {/* Arama Barı */}
+        <div className="relative w-full">
+          <input
+            ref={inputRef}
+            placeholder="Search City"
+            className="rounded-2xl px-5 py-3 w-full text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={handleInputChange}
+          />
+          <AiOutlineSearch className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-500" />
+          {/* Arama Sonuçları */}
+          {searchResults.length > 0 && (
+            <ul className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 z-10">
               {searchResults.map((location) => (
                 <li
                   key={location.id}
                   onClick={() => handleResultClick(location)}
-                  className="cursor-pointer text-[14px] border-b-[0.2px] border-gray-300 border-solid pl-[15px] py-[20px] px-[10px] w-full flex items-center h-[30px] hover:bg-blue-700 hover:text-white last:border-none"
+                  className="px-4 py-2 cursor-pointer hover:bg-blue-500 hover:text-white"
                 >
-                  {location.name + " , " + location.country}
+                  {location.name}, {location.country}
                 </li>
               ))}
             </ul>
-          </div>
+          )}
         </div>
-      </div>
-      <div className="mt-[100px] font-bold p-[50px] text-white text-[20px] flex flex-col items-center text-center rounded-[10px] bg-[#000000a5]">
-        Today
-        <img className="pt-[10px]" src={imgWeather} />
-        {foreCast && <h2 className="text-white text-[20px] font-bold">{foreCast}</h2>}
-        {city && country && (
-          <h2 className="text-white font-normal text-[20px]">
-            {city.toUpperCase()} / {country}
+
+        {/* Bugünün Hava Durumu */}
+        <div className="text-center">
+          <img src={imgWeather} alt="Weather icon" className="mx-auto mb-4" />
+          <h2 className="text-3xl font-semibold text-gray-800">
+            {city.toUpperCase()}, {country}
           </h2>
-        )}
-        {degree && <h2 className="text-white text-[20px]">{degree} °C</h2>}
+          <h3 className="text-xl text-gray-600">{foreCast}</h3>
+          <h3 className="text-4xl text-gray-800 font-bold">{degree} °C</h3>
+        </div>
 
-        <div className="flex gap-52 mt-[25px] max-[600px]:flex-col max-[600px]:gap-5">
-        {nextForeCasts.map((forecast,i) => (
-          <div key={i} className="flex flex-col items-center justify-center bg-[#e1e1e116] w-[200px] p-[20px] rounded-[10px]">
-            <p className="text-white">{forecast.date}</p>
-            <img className="" src={forecast.day.condition.icon}></img>
-            <h3 className="text-white text-[20px] font-bold">
-              {forecast.day.condition.text}
-            </h3>
-            <h3 className="text-white text-[20px]">
-              AVG : {forecast.day.avgtemp_c} °C
-            </h3>
-          </div>
-        ))}
-      </div>
-
+        {/* 3 Günlük Hava Durumu */}
+        <div className="flex justify-center space-x-4 mt-6">
+          {nextForeCasts.map((forecast, i) => (
+            <div
+              key={i}
+              className="bg-blue-100 rounded-xl p-4 flex flex-col items-center shadow-md"
+            >
+              <p className="text-gray-700 font-semibold">{forecast.date}</p>
+              <img
+                src={forecast.day.condition.icon}
+                alt="Forecast icon"
+                className="w-16 h-16"
+              />
+              <p className="text-gray-600">{forecast.day.condition.text}</p>
+              <p className="text-xl font-bold text-gray-800">
+                {forecast.day.avgtemp_c} °C
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
